@@ -1,6 +1,33 @@
-version: '3'
+version: "3.8"
+
 services:
   streamlit:
-    build: .
+    build:
+      context: ./src
+      dockerfile: Dockerfile
     ports:
       - "8501:8501"
+    volumes:
+      - ./src:/app
+    environment:
+      - STREAMLIT_ENV=local
+    # No need for depends_on, as Nginx will forward traffic to Streamlit.
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant-data:/qdrant/storage
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro  # Ensure read-only mount and correct path
+    depends_on:
+      - streamlit  # Nginx will wait for Streamlit to be up before starting.
+
+volumes:
+  qdrant-data:
