@@ -1,0 +1,26 @@
+name: Deploy to Kubernetes
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Kubernetes Context
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
+          export KUBECONFIG=kubeconfig.yaml
+
+      - name: Build & Push Docker Image
+        run: |
+          docker build -t my-streamlit-app:latest .
+          docker tag my-streamlit-app:latest my-dockerhub-username/my-streamlit-app:latest
+          docker push my-dockerhub-username/my-streamlit-app:latest
+
+      - name: Deploy to Kubernetes
+        run: kubectl apply -f k8s/
