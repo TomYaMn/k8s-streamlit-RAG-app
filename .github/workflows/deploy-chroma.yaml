@@ -1,0 +1,32 @@
+name: Deploy ChromaDB to Production
+
+on:
+  workflow_run:
+    workflows: ["Backup & Upload ChromaDB Data"]
+    types:
+      - completed
+
+jobs:
+  deploy-chroma:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Download ChromaDB Backup
+        uses: actions/download-artifact@v3
+        with:
+          name: chroma-db-backup
+          path: ./chroma_data_backup
+
+      - name: Transfer Backup to Production Server
+        run: |
+          scp -o StrictHostKeyChecking=no ./chroma_data_backup/chroma_backup.tar.gz user@prod-server:/tmp/
+
+      - name: Restore ChromaDB on Production
+        run: |
+          ssh -o StrictHostKeyChecking=no user@prod-server << 'EOF'
+            tar -xzf /tmp/chroma_backup.tar.gz -C /path/to/prod_chroma/
+            docker restart chromadb_container
+          EOF

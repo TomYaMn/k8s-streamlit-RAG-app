@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: streamlit-app
+  name: streamlit
 spec:
   replicas: 1
   selector:
@@ -13,7 +13,29 @@ spec:
         app: streamlit
     spec:
       containers:
-      - name: streamlit
-        image: my-dockerhub-username/my-streamlit-app:latest
-        ports:
-        - containerPort: 8501
+        - name: streamlit
+          image: your_dockerhub_account/streamlit-app:latest  # Replace with your image
+          ports:
+            - containerPort: 8501
+          env:
+            - name: STREAMLIT_ENV
+              value: "local"
+          volumeMounts:
+            - name: app-volume
+              mountPath: /app
+      volumes:
+        - name: app-volume
+          persistentVolumeClaim:
+            claimName: streamlit-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: streamlit
+spec:
+  selector:
+    app: streamlit
+  ports:
+    - port: 80
+      targetPort: 8501
+  type: LoadBalancer

@@ -1,0 +1,1 @@
+{"lc": 1, "type": "constructor", "id": ["langchain", "schema", "document", "Document"], "kwargs": {"metadata": {"doc_id": "77f033ab-a9bb-4bca-a1f0-86372e4a2a3c"}, "page_content": "\u2022 A midnight-black cloak woven from woven void-silk, cold to the touch.\n\n\u2022 Wrap it around yourself, and you can step into any shadow and emerge from another nearby.", "type": "Document"}}
